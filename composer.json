@@ -1,0 +1,29 @@
+{
+    "name": "nativephp/php-bin",
+    "description": "PHP binaries used by the NativePHP framework",
+    "keywords": [
+        "nativephp",
+        "php"
+    ],
+    "homepage": "https://nativephp.com",
+    "license": [
+        "Apache-2.0",
+        "GPL-3.0-or-later",
+        "MIT",
+        "PHP-3.01"
+    ],
+    "authors": [
+        {
+            "name": "Marcel Pociot",
+            "email": "marcel@beyondco.de",
+            "role": "Developer"
+        },
+        {
+            "name": "Simon Hamp",
+            "email": "simon.hamp@me.com",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
