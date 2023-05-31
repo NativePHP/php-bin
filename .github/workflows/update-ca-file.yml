@@ -47,17 +47,22 @@ jobs:
         run: |
           LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
           | jq -r .tag_name)
-          echo "::set-output name=version::${LATEST_VERSION}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Bump the patch version
+        id: bump
+        run: |
+          NEW_VERSION=$(echo "${{ steps.latestrelease.outputs.version }}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
+          echo "::set-output name=version::${NEW_VERSION}"
 
       - name: Create a new release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ steps.latestrelease.outputs.version }}
-          release_name: Release ${{ steps.latestrelease.outputs.version }}
-          draft: false
+          tag_name: v${{ steps.latestrelease.outputs.version }}
+          release_name: v${{ steps.latestrelease.outputs.version }}
+          draft: true
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
