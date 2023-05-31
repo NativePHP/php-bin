@@ -1,0 +1,63 @@
+name: Fetch Latest CA File
+
+on:
+  schedule:
+    # This will run daily at 00:00 UTC.
+    - cron:  '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-ca-file:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v3
+
+    - name: Fetch the latest CA file
+      run: |
+        curl -O https://curl.se/ca/cacert.pem
+        echo "Fetched the latest CA file."
+
+    - name: Check if the CA file has changed
+      id: cafile
+      run: |
+        CHANGED=$(git diff --name-only | grep cacert.pem || true)
+        if [[ ! -z "$CHANGED" ]]; then
+          echo "::set-output name=changed::true"
+        else
+          echo "::set-output name=changed::false"
+        fi
+
+    - name: Commit changes
+      if: steps.cafile.outputs.changed == 'true'
+      run: |
+        git config --local user.email "simon.hamp@me.com"
+        git config --local user.name "Simon Hamp"
+        git add cacert.pem
+        git commit -m "Update CA file"
+        git push
+
+  release:
+    needs: fetch-ca-file
+    if: needs.fetch-ca-file.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the latest release
+        id: latestrelease
+        run: |
+          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
+          | jq -r .tag_name)
+          echo "::set-output name=version::${LATEST_VERSION}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create a new release
+        id: create_release
+        uses: actions/create-release@v1
+        with:
+          tag_name: ${{ steps.latestrelease.outputs.version }}
+          release_name: Release ${{ steps.latestrelease.outputs.version }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
