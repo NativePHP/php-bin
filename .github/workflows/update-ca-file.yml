@@ -36,6 +36,8 @@ jobs:
         git add cacert.pem
         git commit -m "Update CA file"
         git push
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release:
     needs: fetch-ca-file
