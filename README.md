@@ -18,6 +18,10 @@ npm -i @nativephp/php-bin --save-dev
 > You should install this package as a `dev` dependency, in most cases, and simply copy what you need from it to the
 relevant parts of your application. This will save you distributing all of the PHP binaries with every installation.
 
+## Issues
+
+Please raise any issues on the [NativePHP/laravel](/nativephp/laravel/issues/new/choose) repo.
+
 ## Credits
 
 - [Marcel Pociot](https://github.com/mpociot)
