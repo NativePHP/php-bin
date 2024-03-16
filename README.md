@@ -11,7 +11,7 @@ composer require nativephp/php-bin --dev
 or NPM:
 
 ```shell
-npm -i @nativephp/php-bin --save-dev
+npm i @nativephp/php-bin --save-dev
 ```
 
 ### ℹ️ Heads up...
