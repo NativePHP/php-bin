@@ -23,15 +23,23 @@ relevant parts of your application. This will save you distributing all of the P
 NativePHP uses [`static-php-cli`](https://static-php.dev) to build minimal, statically-linked, self-contained PHP
 executables for each platform.
 
-The default build commands are:
+You need to build separately for each PHP version:
 
+### PHP 8.2
 ```shell
-bin/spc download --clear
-bin/spc download --with-php=8.2 --for-extensions "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sqlite3,tokenizer,xml,zlib"
+bin/spc download --clean
+bin/spc download --with-php=8.2 --for-extensions "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
 ```
 
+### PHP 8.3
 ```shell
-bin/spc build --build-cli --build-embed "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sqlite3,tokenizer,xml,zlib"
+bin/spc download --clean
+bin/spc download --with-php=8.3 --for-extensions "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
+```
+
+### Build
+```shell
+bin/spc build --build-cli --build-embed "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
 ```
 
 You need to build these on the relevant platform to compile binaries for that platform.
