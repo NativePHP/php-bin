@@ -32,7 +32,7 @@ jobs:
         fi
 
     - name: Commit changes
-      if: ${{ env.CHANGED }} == 'true'
+      if: env.CHANGED == 'true'
       run: |
         git config --local user.email "simon.hamp@me.com"
         git config --local user.name "Simon Hamp"
