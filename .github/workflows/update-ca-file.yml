@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Check out repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Fetch the latest CA file
       run: |
@@ -26,13 +26,13 @@ jobs:
       run: |
         CHANGED=$(git diff --name-only | grep cacert.pem || true)
         if [[ ! -z "$CHANGED" ]]; then
-          echo "::set-output name=changed::true"
+          echo "CHANGED=true" >> $GITHUB_ENV
         else
-          echo "::set-output name=changed::false"
+          echo "CHANGED=false" >> $GITHUB_ENV
         fi
 
     - name: Commit changes
-      if: steps.cafile.outputs.changed == 'true'
+      if: ${{ env.CHANGED }} == 'true'
       run: |
         git config --local user.email "simon.hamp@me.com"
         git config --local user.name "Simon Hamp"
@@ -59,14 +59,14 @@ jobs:
         id: bump
         run: |
           NEW_VERSION=$(echo "${{ steps.latestrelease.outputs.version }}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          echo "::set-output name=version::${NEW_VERSION}"
+          echo "VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
       - name: Create a new release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: v${{ steps.latestrelease.outputs.version }}
-          release_name: v${{ steps.latestrelease.outputs.version }}
+          tag_name: v${{ VERSION }}
+          release_name: v${{ VERSION }}
           draft: true
           prerelease: false
         env:
