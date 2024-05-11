@@ -46,7 +46,7 @@ You need to build these on the relevant platform to compile binaries for that pl
 
 ## Issues
 
-Please raise any issues on the [NativePHP/laravel](/nativephp/laravel/issues/new/choose) repo.
+Please raise any issues on the [NativePHP/laravel](https://github.com/nativephp/laravel/issues/new/choose) repo.
 
 ## Credits
 
