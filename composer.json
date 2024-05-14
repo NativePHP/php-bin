@@ -5,6 +5,12 @@
         "nativephp",
         "php"
     ],
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/simonhamp"
+        }
+    ],
     "homepage": "https://nativephp.com",
     "license": [
         "Apache-2.0",
