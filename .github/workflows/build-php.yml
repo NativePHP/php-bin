@@ -94,8 +94,11 @@ jobs:
           key: spc-downloads-${{ env.PHP_EXT_HASH }}
 
       # If there's no downloads cached, fetch sources
-      - if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
-        run: ../static-php-cli/bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+      - name: Download PHP extension sources
+        if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
+        run: |
+          cd .
+          ../static-php-cli/bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
 
       - name: Build PHP
         run: ../static-php-cli/bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
