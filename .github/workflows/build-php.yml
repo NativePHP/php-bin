@@ -1,0 +1,108 @@
+name: Build latest PHP versions for each arch
+
+on:
+  schedule:
+    # This will run weekly on Sunday at 00:00 UTC.
+    - cron:  '0 0 * * 0'
+  workflow_dispatch:
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    name: Build latest PHP ${{ matrix.version }} for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        version: [8.1, 8.2, 8.3]
+        os: ["macos-13", "macos-latest", "windows-latest", "ubuntu-latest"]
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download SPC
+        run: |
+          cd ..
+          git clone https://github.com/crazywhalecc/static-php-cli.git
+          cd static-php-cli
+          git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+          cd ../php-bin
+
+      - run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
+
+      - if: matrix.os = 'macos-latest'
+        run: echo "SPC_BUILD_ARCH=arm64" >> $GITHUB_ENV
+
+      - if: matrix.os = 'macos-13'
+        run: echo "SPC_BUILD_ARCH=x86" >> $GITHUB_ENV
+
+      - if: matrix.os = 'macos-latest' || matrix.os = 'macos-13'
+        run: |
+          brew install automake gzip
+          echo "SPC_BUILD_OS=mac" >> $GITHUB_ENV
+
+      - if: matrix.os = 'windows-latest'
+        run: echo "SPC_BUILD_OS=win" >> $GITHUB_ENV
+
+      - if: matrix.os = 'ubuntu-latest'
+        run: echo "SPC_BUILD_OS=linux" >> $GITHUB_ENV
+
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          tools: pecl, composer
+          extensions: curl, openssl, mbstring, tokenizer
+          ini-values: memory_limit=-1
+
+      # Cache composer dependencies
+      - id: cache-composer-deps
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: composer-dependencies
+
+      # If there's no Composer cache, install dependencies
+      - if: steps.cache-composer-deps.outputs.cache-hit != 'true'
+        run: |
+          cd static-php-cli
+          composer update --no-dev --classmap-authoritative
+          cd ../php-bin
+
+      # Cache downloaded source
+      - id: cache-download
+        uses: actions/cache@v3
+        with:
+          path: ../static-php-cli/downloads
+          key: php-${{ matrix.version }}
+
+      - name: Read PHP extensions from file
+        id: read-extensions
+        run: |
+          EXTENSIONS=$(cat php-extensions.txt | tr '\n' ',' | sed 's/,$//')
+          echo "PHP_EXTENSIONS=$EXTENSIONS" >> $GITHUB_ENV
+
+      # If there's no dependencies cache, fetch sources, with or without debug
+      - if: steps.cache-download.outputs.cache-hit != 'true'
+        run: ../static-php-cli/bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+
+      # Run build command
+      - run: ../static-php-cli/bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
+
+      # Zip the binaries, license, and metadata files
+      - name: Zip PHP binary, copy metadata
+        run: |
+          zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
+          cp ../static-php-cli/buildroot/license/* license-files/
+          cp ../static-php-cli/buildroot/build-*.json build-meta/
+
+      # Commit and push the zipped files back to the repository
+      - name: Commit and Push files
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git add .
+          git commit -m "Add PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
+          git push origin
