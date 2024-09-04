@@ -89,7 +89,7 @@ jobs:
         shell: bash
         run: |
           EXTENSIONS=$(php -r "echo trim(file_get_contents('php-extensions.txt'));")
-          EXT_HASH=$(php -r "md5(getenv('EXTENSIONS'));")
+          EXT_HASH=$(php -r "echo md5(getenv('EXTENSIONS'));")
           echo "PHP_EXTENSIONS=$EXTENSIONS" >> $GITHUB_ENV
           echo "PHP_EXT_HASH=$EXT_HASH" >> $GITHUB_ENV
 
