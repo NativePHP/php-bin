@@ -1,0 +1,10 @@
+[
+    "zlib",
+    "openssl",
+    "libiconv",
+    "libxml2",
+    "curl",
+    "libpng",
+    "sqlite",
+    "libzip"
+]

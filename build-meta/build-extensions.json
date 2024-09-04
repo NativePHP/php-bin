@@ -1,0 +1,23 @@
+[
+    "bcmath",
+    "ctype",
+    "curl",
+    "dom",
+    "fileinfo",
+    "filter",
+    "zlib",
+    "gd",
+    "mbstring",
+    "opcache",
+    "openssl",
+    "pdo",
+    "sqlite3",
+    "pdo_sqlite",
+    "phar",
+    "session",
+    "simplexml",
+    "sockets",
+    "tokenizer",
+    "xml",
+    "zip"
+]
