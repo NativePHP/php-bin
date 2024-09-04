@@ -1,4 +1,4 @@
-name: Build latest PHP versions for each arch
+name: Build PHP
 
 permissions:
   contents: write
@@ -15,7 +15,7 @@ env:
 
 jobs:
   build:
-    name: Build latest PHP ${{ matrix.version }} for ${{ matrix.os }}
+    name: ${{ matrix.version }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -116,8 +116,13 @@ jobs:
           cd ../php-bin
 
       - name: Zip PHP binary, copy metadata
+        shell: bash
         run: |
-          zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            powershell Compress-Archive -Path ../static-php-cli/buildroot/bin/php.exe -DestinationPath bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip
+          else
+            zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
+          fi
           cp ../static-php-cli/buildroot/license/* license-files/
           cp ../static-php-cli/buildroot/build-*.json build-meta/
 
