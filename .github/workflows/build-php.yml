@@ -66,7 +66,7 @@ jobs:
 
       # Cache composer dependencies
       - id: cache-spc-composer-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ../static-php-cli/vendor
           key: composer-dependencies
@@ -96,7 +96,7 @@ jobs:
 
       # Cache downloaded source
       - id: cache-spc-downloads
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ../static-php-cli/downloads
           key: spc-downloads-${{ env.PHP_EXT_HASH }}
@@ -122,7 +122,7 @@ jobs:
           cp ../static-php-cli/buildroot/build-*.json build-meta/
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v7
         with:
           branch: update-php-${{ matrix.version }}-${{ env.SPC_BUILD_OS }}-${{ env.SPC_BUILD_ARCH }}
           title: "Update PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
