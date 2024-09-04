@@ -74,6 +74,7 @@ jobs:
 
       # Make sure we have everything we need to run SPC
       - name: SPC doctor
+        if: matrix.os != 'windows-latest'
         run: ../static-php-cli/bin/spc doctor
 
       - name: Read PHP extensions from file
