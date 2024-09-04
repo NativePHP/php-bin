@@ -118,10 +118,14 @@ jobs:
           cp ../static-php-cli/buildroot/license/* license-files/
           cp ../static-php-cli/buildroot/build-*.json build-meta/
 
-      - name: Commit and Push files
-        run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'actions@github.com'
-          git add .
-          git commit -m "Add PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
-          git push origin
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: update-php-${{ matrix.version }}-${{ env.SPC_BUILD_OS }}-${{ env.SPC_BUILD_ARCH }}
+          title: "Update PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
+          commit-message: "build"
+          body: |
+            PHP: ${{ matrix.version }}
+            Exts: ${{ env.PHP_EXTENSIONS }}
+            OS+arch: ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}.
+          base: main
