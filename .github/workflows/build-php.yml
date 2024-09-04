@@ -28,7 +28,7 @@ jobs:
           cd ..
           git clone https://github.com/crazywhalecc/static-php-cli.git
           cd static-php-cli
-          git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+          git checkout main
           cd ../php-bin
 
       - run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
