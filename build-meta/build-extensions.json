@@ -1,15 +1,17 @@
 [
     "bcmath",
     "ctype",
+    "zlib",
+    "openssl",
     "curl",
+    "iconv",
+    "xml",
     "dom",
     "fileinfo",
     "filter",
-    "zlib",
     "gd",
     "mbstring",
     "opcache",
-    "openssl",
     "pdo",
     "sqlite3",
     "pdo_sqlite",
@@ -18,6 +20,6 @@
     "simplexml",
     "sockets",
     "tokenizer",
-    "xml",
+    "bz2",
     "zip"
 ]
