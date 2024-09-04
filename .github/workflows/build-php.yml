@@ -45,7 +45,7 @@ jobs:
       - if: matrix.os == 'macos-13'
         run: echo "SPC_BUILD_ARCH=x86" >> $GITHUB_ENV
 
-      - if: matrix.os == 'macos-latest' || matrix.os == 'macos-13'
+      - if: contains('macos', matrix.os)
         run: |
           brew install automake gzip
           echo "SPC_BUILD_OS=mac" >> $GITHUB_ENV
@@ -71,14 +71,13 @@ jobs:
           path: ../static-php-cli/vendor
           key: composer-dependencies
 
-      # If there's no Composer cache, install dependencies
-      - if: steps.cache-spc-composer-deps.outputs.cache-hit != 'true'
+      - name: Install SPC Composer dependencies
+        if: steps.cache-spc-composer-deps.outputs.cache-hit != 'true'
         run: |
           cd ../static-php-cli
           composer update --no-dev --classmap-authoritative
           cd ../php-bin
 
-      # Make sure we have everything we need to run SPC
       - name: SPC doctor
         run: |
           cd ../static-php-cli
@@ -101,7 +100,6 @@ jobs:
           path: ../static-php-cli/downloads
           key: spc-downloads-${{ env.PHP_EXT_HASH }}
 
-      # If there's no downloads cached, fetch sources
       - name: Download PHP extension sources
         if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
         run: |
@@ -114,6 +112,13 @@ jobs:
           cd ../static-php-cli
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
+
+      - name: Install Zip on WSL
+        if: matrix.os == 'windows-latest'
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install zip -y
 
       - name: Zip PHP binary, copy metadata
         shell: bash
