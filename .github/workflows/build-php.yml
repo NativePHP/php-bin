@@ -50,7 +50,7 @@ jobs:
       - if: matrix.os == 'ubuntu-latest'
         run: echo "SPC_BUILD_OS=linux" >> $GITHUB_ENV
 
-      - name: "Setup PHP"
+      - name: Setup system PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: 8.1
@@ -59,47 +59,51 @@ jobs:
           ini-values: memory_limit=-1
 
       # Cache composer dependencies
-      - id: cache-composer-deps
+      - id: cache-spc-composer-deps
         uses: actions/cache@v3
         with:
-          path: vendor
+          path: ../static-php-cli/vendor
           key: composer-dependencies
 
       # If there's no Composer cache, install dependencies
-      - if: steps.cache-composer-deps.outputs.cache-hit != 'true'
+      - if: steps.cache-spc-composer-deps.outputs.cache-hit != 'true'
         run: |
           cd ../static-php-cli
           composer update --no-dev --classmap-authoritative
           cd ../php-bin
 
-      # Cache downloaded source
-      - id: cache-download
-        uses: actions/cache@v3
-        with:
-          path: ../static-php-cli/downloads
-          key: php-${{ matrix.version }}
+      # Make sure we have everything we need to run SPC
+      - name: SPC doctor
+        run: ../static-php-cli/bin/spc doctor
 
       - name: Read PHP extensions from file
         id: read-extensions
         run: |
           EXTENSIONS=$(php -r "echo trim(file_get_contents('php-extensions.txt'));")
+          EXT_HASH=$(php -r "md5(get_env('EXTENSIONS'));")
           echo "PHP_EXTENSIONS=$EXTENSIONS" >> $GITHUB_ENV
+          echo "PHP_EXT_HASH=$EXT_HASH" >> $GITHUB_ENV
 
-      # If there's no dependencies cache, fetch sources, with or without debug
-      - if: steps.cache-download.outputs.cache-hit != 'true'
+      # Cache downloaded source
+      - id: cache-spc-downloads
+        uses: actions/cache@v3
+        with:
+          path: ../static-php-cli/downloads
+          key: spc-downloads-${{ env.PHP_EXT_HASH }}
+
+      # If there's no downloads cached, fetch sources
+      - if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
         run: ../static-php-cli/bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
 
-      # Run build command
-      - run: ../static-php-cli/bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
+      - name: Build PHP
+        run: ../static-php-cli/bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
 
-      # Zip the binaries, license, and metadata files
       - name: Zip PHP binary, copy metadata
         run: |
           zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
           cp ../static-php-cli/buildroot/license/* license-files/
           cp ../static-php-cli/buildroot/build-*.json build-meta/
 
-      # Commit and push the zipped files back to the repository
       - name: Commit and Push files
         run: |
           git config --global user.name 'GitHub Actions'
