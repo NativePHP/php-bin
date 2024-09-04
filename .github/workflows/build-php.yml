@@ -81,7 +81,7 @@ jobs:
       - name: Read PHP extensions from file
         id: read-extensions
         run: |
-          EXTENSIONS=$(cat php-extensions.txt | tr '\n' ',' | sed 's/,$//')
+          EXTENSIONS=$(php -r "echo trim(file_get_contents('php-extensions.txt'));")
           echo "PHP_EXTENSIONS=$EXTENSIONS" >> $GITHUB_ENV
 
       # If there's no dependencies cache, fetch sources, with or without debug
