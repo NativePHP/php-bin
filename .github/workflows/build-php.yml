@@ -74,8 +74,10 @@ jobs:
 
       # Make sure we have everything we need to run SPC
       - name: SPC doctor
-        if: matrix.os != 'windows-latest'
-        run: ../static-php-cli/bin/spc doctor
+        run: |
+          cd ../static-php-cli
+          ./bin/spc doctor
+          cd ../php-bin
 
       - name: Read PHP extensions from file
         id: read-extensions
@@ -97,11 +99,15 @@ jobs:
       - name: Download PHP extension sources
         if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
         run: |
-          echo %cd%
-          ../static-php-cli/bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+          cd ../static-php-cli
+          ./bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+          cd ../php-bin
 
       - name: Build PHP
-        run: ../static-php-cli/bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
+        run: |
+          cd ../static-php-cli
+          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
+          cd ../php-bin
 
       - name: Zip PHP binary, copy metadata
         run: |
