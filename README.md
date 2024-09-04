@@ -18,31 +18,15 @@ npm -i @nativephp/php-bin --save-dev
 > You should install this package as a `dev` dependency, in most cases, and simply copy what you need from it to the
 relevant parts of your application. This will save you distributing all of the PHP binaries with every installation.
 
-## Creating new binaries
+## Building
 
 NativePHP uses [`static-php-cli`](https://static-php.dev) to build minimal, statically-linked, self-contained PHP
 executables for each platform.
 
-You need to build separately for each PHP version:
+They are automatically built weekly to get the latest versions of PHP near enough as soon as they become available.
 
-### PHP 8.2
-```shell
-bin/spc download --clean
-bin/spc download --with-php=8.2 --for-extensions "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
-```
-
-### PHP 8.3
-```shell
-bin/spc download --clean
-bin/spc download --with-php=8.3 --for-extensions "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
-```
-
-### Build
-```shell
-bin/spc build --build-cli --build-embed "bcmath,ctype,curl,dom,fileinfo,filter,mbstring,openssl,pdo,pdo_sqlite,session,simplexml,sockets,sqlite3,tokenizer,xml,zlib"
-```
-
-You need to build these on the relevant platform to compile binaries for that platform.
+[Check here](https://github.com/NativePHP/php-bin/blob/automate-builds/php-extensions.txt) for the definitive list of
+extensions that are compiled in.
 
 ## Issues
 
