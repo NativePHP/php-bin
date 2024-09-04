@@ -123,12 +123,18 @@ jobs:
       - name: Zip PHP binary, copy metadata
         shell: bash
         run: |
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php" -DestinationPath "bin/${env:SPC_BUILD_OS}/${env:SPC_BUILD_ARCH}/php-${{ matrix.version }}.zip"
+          else
+            zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
+          fi
           zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
           cp ../static-php-cli/buildroot/license/* license-files/
           cp ../static-php-cli/buildroot/build-extensions.json build-meta/build-extensions-${{ env.SPC_BUILD_OS }}.json
           cp ../static-php-cli/buildroot/build-libraries.json build-meta/build-libraries-${{ env.SPC_BUILD_OS }}.json
 
       - name: Create Pull Request
+        if: matrix.os != 'windows-latest'
         uses: peter-evans/create-pull-request@v7
         with:
           branch: update-php-${{ matrix.version }}-${{ env.SPC_BUILD_OS }}-${{ env.SPC_BUILD_ARCH }}
@@ -137,5 +143,20 @@ jobs:
           body: |
             PHP: ${{ matrix.version }}
             Exts: ${{ env.PHP_EXTENSIONS }}
-            OS+arch: ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}.
+            OS: ${{ env.SPC_BUILD_OS }}
+            Arch: ${{ env.SPC_BUILD_ARCH }}
+          base: main
+
+      - name: Create Pull Request (Win)
+        if: matrix.os == 'windows-latest'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: update-php-${{ matrix.version }}-${env:SPC_BUILD_OS}-${env:SPC_BUILD_ARCH}
+          title: "Update PHP ${{ matrix.version }} build for ${env:SPC_BUILD_OS} ${env:SPC_BUILD_ARCH}"
+          commit-message: "build"
+          body: |
+            PHP: ${{ matrix.version }}
+            Exts: ${env:PHP_EXTENSIONS}
+            OS: ${env:SPC_BUILD_OS}
+            Arch: ${env:SPC_BUILD_ARCH}
           base: main
