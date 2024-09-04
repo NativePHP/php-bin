@@ -113,13 +113,6 @@ jobs:
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
 
-      - name: Install Zip on WSL
-        if: matrix.os == 'windows-latest'
-        shell: bash
-        run: |
-          apt-get update
-          apt-get install zip -y
-
       - name: Zip PHP binary, copy metadata
         shell: bash
         run: |
@@ -128,7 +121,6 @@ jobs:
           else
             zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
           fi
-          zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip ../static-php-cli/buildroot/bin/php
           cp ../static-php-cli/buildroot/license/* license-files/
           cp ../static-php-cli/buildroot/build-extensions.json build-meta/build-extensions-${{ env.SPC_BUILD_OS }}.json
           cp ../static-php-cli/buildroot/build-libraries.json build-meta/build-libraries-${{ env.SPC_BUILD_OS }}.json
