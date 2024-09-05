@@ -37,23 +37,29 @@ jobs:
           git checkout main
           cd ../php-bin
 
-      - run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
+      - shell: bash
+        run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
 
-      - if: matrix.os == 'macos-latest'
+      - shell: bash
+        if: matrix.os == 'macos-latest'
         run: echo "SPC_BUILD_ARCH=arm64" >> $GITHUB_ENV
 
-      - if: matrix.os == 'macos-13'
+      - shell: bash
+        if: matrix.os == 'macos-13'
         run: echo "SPC_BUILD_ARCH=x86" >> $GITHUB_ENV
 
-      - if: contains(matrix.os, 'macos')
+      - shell: bash
+        if: contains(matrix.os, 'macos')
         run: |
           brew install automake gzip
           echo "SPC_BUILD_OS=mac" >> $GITHUB_ENV
 
-      - if: matrix.os == 'windows-latest'
+      - shell: bash
+        if: matrix.os == 'windows-latest'
         run: echo "SPC_BUILD_OS=win" >> $GITHUB_ENV
 
-      - if: matrix.os == 'ubuntu-latest'
+      - shell: bash
+        if: matrix.os == 'ubuntu-latest'
         run: echo "SPC_BUILD_OS=linux" >> $GITHUB_ENV
 
       - name: Setup system PHP
@@ -117,7 +123,7 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php.exe" -DestinationPath "bin/${env:SPC_BUILD_OS}/${env:SPC_BUILD_ARCH}/php-${{ matrix.version }}.zip"
+            powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php.exe" -DestinationPath "bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip"
           else
             mkdir -p tmp-bin
             cp ../static-php-cli/buildroot/bin/php tmp-bin/
