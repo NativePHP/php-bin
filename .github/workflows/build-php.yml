@@ -121,7 +121,9 @@ jobs:
           else
             mkdir -p tmp-bin
             cp ../static-php-cli/buildroot/bin/php tmp-bin/
-            zip bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip tmp-bin/php
+            cd tmp-bin
+            zip ../bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip php
+            cd ..
             rm -rf tmp-bin
           fi
           cp ../static-php-cli/buildroot/license/* license-files/
