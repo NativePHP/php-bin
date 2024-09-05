@@ -38,6 +38,11 @@ jobs:
           cd ../php-bin
 
       - shell: bash
+        run: |
+          PHP_VERSION=$(echo "${{ matrix.version }}" | cut -d. -f1,2)
+          echo "PHP_VERSION=$PHP_VERSION" >> $GITHUB_ENV
+
+      - shell: bash
         run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
 
       - shell: bash
@@ -119,16 +124,21 @@ jobs:
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
 
+      - shell: bash
+        run: |
+          PHP_VERSION_FULL=$(php -r "echo PHP_VERSION;")
+          echo "PHP_VERSION_FULL=$PHP_VERSION_FULL" >> $GITHUB_ENV
+
       - name: Zip PHP binary, copy metadata
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php.exe" -DestinationPath "bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip"
+            powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php.exe" -DestinationPath "bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ env.PHP_VERSION }}.zip" -Force
           else
             mkdir -p tmp-bin
             cp ../static-php-cli/buildroot/bin/php tmp-bin/
             cd tmp-bin
-            zip ../bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ matrix.version }}.zip php
+            zip ../bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ env.PHP_VERSION }}.zip php
             cd ..
             rm -rf tmp-bin
           fi
@@ -139,11 +149,11 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: update-php-${{ matrix.version }}-${{ env.SPC_BUILD_OS }}-${{ env.SPC_BUILD_ARCH }}
-          title: "Update PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
+          branch: update-php-${{ env.PHP_VERSION }}-${{ env.SPC_BUILD_OS }}-${{ env.SPC_BUILD_ARCH }}
+          title: "Update PHP ${{ env.PHP_VERSION }} build for ${{ env.SPC_BUILD_OS }} ${{ env.SPC_BUILD_ARCH }}"
           commit-message: "build"
           body: |
-            PHP: ${{ matrix.version }}
+            PHP: ${{ env.PHP_VERSION_FULL }}
             Exts: ${{ env.PHP_EXTENSIONS }}
             OS: ${{ env.SPC_BUILD_OS }}
             Arch: ${{ env.SPC_BUILD_ARCH }}
