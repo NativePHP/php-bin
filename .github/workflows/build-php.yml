@@ -124,7 +124,8 @@ jobs:
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
 
-      - shell: bash
+      - name: Get built PHP version
+        shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             PHP_VERSION_FULL=$(../static-php-cli/buildroot/bin/php.exe -r "echo PHP_VERSION;")
