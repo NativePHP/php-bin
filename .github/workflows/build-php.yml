@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        version: ["8.1", "8.2", "8.3"]
+        version: ["8.1", "8.2.22", "8.3.10"]
         os: ["macos-13", "macos-latest", "windows-latest", "ubuntu-latest"]
 
     continue-on-error: true
