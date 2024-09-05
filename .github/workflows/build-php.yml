@@ -126,7 +126,11 @@ jobs:
 
       - shell: bash
         run: |
-          PHP_VERSION_FULL=$(php -r "echo PHP_VERSION;")
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            PHP_VERSION_FULL=$(../static-php-cli/buildroot/bin/php.exe -r "echo PHP_VERSION;")
+          else
+            PHP_VERSION_FULL=$(../static-php-cli/buildroot/bin/php -r "echo PHP_VERSION;")
+          fi
           echo "PHP_VERSION_FULL=$PHP_VERSION_FULL" >> $GITHUB_ENV
 
       - name: Zip PHP binary, copy metadata
