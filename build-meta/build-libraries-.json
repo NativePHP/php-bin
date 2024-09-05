@@ -1,0 +1,14 @@
+[
+    "zlib",
+    "openssl",
+    "libssh2",
+    "libiconv-win",
+    "libxml2",
+    "nghttp2",
+    "curl",
+    "libpng",
+    "bzip2",
+    "sqlite",
+    "xz",
+    "libzip"
+]
