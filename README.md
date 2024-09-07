@@ -25,7 +25,7 @@ executables for each platform.
 
 They are automatically built weekly to get the latest versions of PHP near enough as soon as they become available.
 
-[Check here](https://github.com/NativePHP/php-bin/blob/automate-builds/php-extensions.txt) for the definitive list of
+[Check here](https://github.com/NativePHP/php-bin/blob/main/php-extensions.txt) for the definitive list of
 extensions that are compiled in.
 
 ## Issues
