@@ -140,7 +140,7 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             powershell Compress-Archive -Path "../static-php-cli/buildroot/bin/php.exe" -DestinationPath "bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ env.PHP_VERSION }}.zip" -Force
           else
-            rm bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ env.PHP_VERSION }}.zip
+            rm -f bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}/php-${{ env.PHP_VERSION }}.zip
             mkdir -p tmp-bin
             cp ../static-php-cli/buildroot/bin/php tmp-bin/
             cd tmp-bin
