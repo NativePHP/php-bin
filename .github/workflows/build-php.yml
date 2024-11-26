@@ -152,6 +152,7 @@ jobs:
           cd ../php-bin
 
       - name: Build PHP
+        shell: bash
         run: |
           cd ../static-php-cli
           if [[ "${{ inputs.enable_debug }}" == "true" ]]; then
