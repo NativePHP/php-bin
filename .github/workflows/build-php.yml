@@ -53,8 +53,8 @@ jobs:
         os: ["macos-13", "macos-latest", "windows-latest", "ubuntu-latest"]
 
         include:
-          - version: ${{ inputs.php_version || matrix.version }}
-            os: ${{ inputs.operating_system || matrix.os }}
+          - version: ${{ inputs.php_version }}
+            os: ${{ inputs.operating_system }}
 
     continue-on-error: true
 
