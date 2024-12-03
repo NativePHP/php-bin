@@ -48,9 +48,11 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
+      max-parallel: 1
       matrix:
-        version: ["8.3", "8.4"]
-        os: ["macos-13", "macos-latest", "windows-latest", "ubuntu-latest"]
+        version: ["8.3"]
+        os: ["macos-13"]
 
         include:
           - version: ${{ inputs.php_version }}
