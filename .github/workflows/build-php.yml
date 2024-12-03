@@ -29,7 +29,7 @@ on:
           - 'windows-latest'
           - 'macos-13'
           - 'macos-latest'
-        default: 'macos-latest'
+        default: 'macos-13'
       enable_debug:
         description: 'Enable debug mode'
         required: false
@@ -109,7 +109,7 @@ jobs:
         with:
           php-version: 8.2
           tools: pecl, composer
-          extensions: curl, openssl, mbstring, sodium, tokenizer
+          extensions: curl, openssl, mbstring, sodium, tokenizer, grpc
           ini-values: memory_limit=-1
 
       # Cache composer dependencies
