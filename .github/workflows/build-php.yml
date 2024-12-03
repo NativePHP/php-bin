@@ -93,7 +93,7 @@ jobs:
       - shell: bash
         if: contains(matrix.os, 'macos')
         run: |
-          brew install automake gzip grpc
+          brew install automake gzip
           echo "SPC_BUILD_OS=mac" >> $GITHUB_ENV
 
       - shell: bash
@@ -109,7 +109,7 @@ jobs:
         with:
           php-version: 8.3
           tools: pecl, composer
-          extensions: curl, openssl, mbstring, sodium, tokenizer, grpc
+          extensions: curl, openssl, mbstring, sodium, tokenizer
           ini-values: memory_limit=-1
 
       # Cache composer dependencies
