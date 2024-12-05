@@ -12,8 +12,8 @@ composer require srwiez/php-bin-with-grpc --dev
 
 Open your `.env` file and add the following line:
 
-```shell
-PHP_BIN_PATH=./vendor/srwiez/php-bin-with-grpc/bin
+```dotenv
+NATIVEPHP_PHP_BINARY_PATH=vendor/srwiez/php-bin-with-grpc/
 ```
 
 And voilà!
