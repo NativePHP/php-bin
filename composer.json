@@ -1,6 +1,6 @@
 {
     "name": "srwiez/php-bin-with-grpc",
-    "description": "PHP binaries used by the NativePHP with gRPC support",
+    "description": "PHP binaries for NativePHP app that needs gRPC support",
     "keywords": [
         "nativephp",
         "php",
