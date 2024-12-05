@@ -6,40 +6,40 @@ permissions:
 
 on:
   schedule:
-#    # This will run weekly on Sunday at 00:00 UTC.
-#    - cron:  '0 0 * * 0'
+    #    # This will run weekly on Sunday at 00:00 UTC.
+    #    - cron:  '0 0 * * 0'
     # This will run daily at 10:00 UTC.
-    - cron:  '0 10 * * *'
+    - cron: '0 10 * * *'
   workflow_dispatch:
-#    inputs:
-#      php_version:
-#        description: 'Select PHP version (optional)'
-#        required: false
-#        type: choice
-#        options:
-#          - '8.1'
-#          - '8.2'
-#          - '8.3'
-#          - '8.4'
-#        default: '8.3'
-#      operating_system:
-#        description: 'Select operating system (optional)'
-#        required: false
-#        type: choice
-#        options:
-#          - 'ubuntu-latest'
-#          - 'windows-latest'
-#          - 'macos-13'
-#          - 'macos-latest'
-#        default: 'macos-13'
-#      enable_debug:
-#        description: 'Enable debug mode'
-#        required: false
-#        type: choice
-#        options:
-#          - 'true'
-#          - 'false'
-#        default: 'false'
+    inputs:
+      php_version:
+        description: 'Select PHP version (optional)'
+        required: false
+        type: choice
+        options:
+          - '8.1'
+          - '8.2'
+          - '8.3'
+          - '8.4'
+        default: '8.3'
+      operating_system:
+        description: 'Select operating system (optional)'
+        required: false
+        type: choice
+        options:
+          - 'ubuntu-latest'
+          - 'windows-latest'
+          - 'macos-13'
+          - 'macos-latest'
+        default: 'macos-13'
+      enable_debug:
+        description: 'Enable debug mode'
+        required: false
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+        default: 'false'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,10 +51,10 @@ jobs:
 
     strategy:
       fail-fast: false
-#      max-parallel: 1
+      #      max-parallel: 1
       matrix:
-        version: ["8.1", "8.2", "8.3", "8.4"]
-        os: ["macos-13", "macos-latest", "ubuntu-latest", "windows-latest"]
+        version: [ "8.1", "8.2", "8.3", "8.4" ]
+        os: [ "macos-13", "macos-latest", "ubuntu-latest", "windows-latest" ]
 
         include:
           - version: ${{ inputs.php_version }}
