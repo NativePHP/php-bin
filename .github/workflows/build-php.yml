@@ -6,10 +6,10 @@ permissions:
 
 on:
   schedule:
-    #    # This will run weekly on Sunday at 00:00 UTC.
-    #    - cron:  '0 0 * * 0'
+    # This will run weekly on Sunday at 00:00 UTC.
+    - cron: '0 0 * * 0'
     # This will run daily at 10:00 UTC.
-    - cron: '0 10 * * *'
+  #    - cron: '0 10 * * *'
   workflow_dispatch:
     inputs:
       php_version:

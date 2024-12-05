@@ -1,21 +1,12 @@
 {
-    "name": "nativephp/php-bin",
-    "description": "PHP binaries used by the NativePHP framework",
+    "name": "srwiez/php-bin-with-grpc",
+    "description": "PHP binaries used by the NativePHP with gRPC support",
     "keywords": [
         "nativephp",
-        "php"
+        "php",
+        "grpc"
     ],
-    "funding": [
-        {
-            "type": "github",
-            "url": "https://github.com/sponsors/simonhamp"
-        },
-        {
-            "type": "opencollective",
-            "url": "https://opencollective.com/nativephp"
-        }
-    ],
-    "homepage": "https://nativephp.com",
+    "homepage": "https://srwiez.com/open-source",
     "license": [
         "Apache-2.0",
         "GPL-3.0-or-later",
@@ -31,6 +22,11 @@
         {
             "name": "Simon Hamp",
             "email": "simon.hamp@me.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Eser Deniz",
+            "email": "srwiez@gmail.com",
             "role": "Developer"
         }
     ],
