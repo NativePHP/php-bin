@@ -2,9 +2,17 @@
     "zlib",
     "openssl",
     "libiconv",
+    "icu",
     "libxml2",
     "curl",
     "libpng",
+    "grpc",
+    "onig",
+    "ncurses",
+    "readline",
+    "libxslt",
+    "libsodium",
+    "postgresql",
     "sqlite",
     "libzip"
 ]
