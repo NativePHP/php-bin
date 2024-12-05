@@ -22,12 +22,12 @@ And voilà!
 
 We currently support PHP versions 8.1 to 8.4, along with macOS and Linux.
 
-|     | MacOS | Linux | Windows |
-|-----|-------|-------|---------|
-| 8.1 | ✅     | ✅     | Soon    |
-| 8.2 | ✅     | ✅     | Soon    |
-| 8.3 | ✅     | ✅     | Soon    |
-| 8.4 | ✅     | ✅     | Soon    |
+|     | MacOS x86 | MacOS arm64 | Linux x86 | Linux arm64 | Windows                                                                            |
+|-----|-----------|-------------|-----------|-------------|------------------------------------------------------------------------------------|
+| 8.1 | ✅         | ✅           | ✅         | Soon        | [Unsupported at the moment](https://github.com/crazywhalecc/static-php-cli/issues) |
+| 8.2 | ✅         | ✅           | ✅         | Soon        | [Unsupported at the moment](https://github.com/crazywhalecc/static-php-cli/issues) |
+| 8.3 | ✅         | ✅           | ✅         | Soon        | [Unsupported at the moment](https://github.com/crazywhalecc/static-php-cli/issues) |
+| 8.4 | ✅         | ✅           | ✅         | Soon        | [Unsupported at the moment](https://github.com/crazywhalecc/static-php-cli/issues) |
 
 ## License
 
