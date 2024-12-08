@@ -11,34 +11,6 @@ on:
     # This will run daily at 10:00 UTC.
   #    - cron: '0 10 * * *'
   workflow_dispatch:
-    inputs:
-      php_version:
-        description: 'Select PHP version (optional)'
-        required: false
-        type: choice
-        options:
-          - '8.1'
-          - '8.2'
-          - '8.3'
-          - '8.4'
-        default: '8.3'
-      operating_system:
-        description: 'Select operating system (optional)'
-        required: false
-        type: choice
-        options:
-          - 'ubuntu-latest'
-          - 'macos-13'
-          - 'macos-latest'
-        default: 'macos-13'
-      enable_debug:
-        description: 'Enable debug mode'
-        required: false
-        type: choice
-        options:
-          - 'true'
-          - 'false'
-        default: 'false'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -54,10 +26,6 @@ jobs:
       matrix:
         version: [ "8.1", "8.2", "8.3", "8.4" ]
         os: [ "macos-13", "macos-latest", "ubuntu-latest" ]
-
-        include:
-          - version: ${{ inputs.php_version }}
-            os: ${{ inputs.operating_system }}
 
     continue-on-error: true
 
@@ -160,11 +128,7 @@ jobs:
         shell: bash
         run: |
           cd ../static-php-cli
-          if [[ "${{ inputs.enable_debug }}" == "true" ]]; then
-            ./bin/spc build --build-cli --debug "${{ env.PHP_EXTENSIONS }}"
-          else
-            ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
-          fi
+          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
 
       - name: Get built PHP version
