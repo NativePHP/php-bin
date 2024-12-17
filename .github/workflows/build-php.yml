@@ -119,7 +119,6 @@ jobs:
           cd ../php-bin
 
       - name: Build PHP
-        shell: bash
         run: |
           cd ../static-php-cli
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
