@@ -39,28 +39,6 @@ jobs:
           [ ! -d php-bin ] && mkdir -p php-bin
           cd php-bin
 
-      # Copy downloads/micro/patches/cli_static.patch
-      # to downloads/micro/patches/cli_static_80.patch
-      # to downloads/micro/patches/cli_static_81.patch
-      # to downloads/micro/patches/cli_static_82.patch
-      # to downloads/micro/patches/cli_static_83.patch
-      # to downloads/micro/patches/cli_static_84.patch
-      #
-      # Remove downloads/micro/patches/cli_static.patch
-      # Remove line 18 of downloads/micro/patches/cli_static_84.patch
-      - name: Fix micro patches
-        shell: bash
-        run: |
-          cd ../static-php-cli
-          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_80.patch
-          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_81.patch
-            cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_82.patch
-            cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_83.patch
-            cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_84.patch
-            sed -i '' '18d' downloads/micro/patches/cli_static_84.patch
-            rm -f downloads/micro/patches/cli_static.patch
-          cd ../php-bin
-
       - shell: bash
         run: |
           PHP_VERSION=$(echo "${{ matrix.version }}" | cut -d. -f1,2)
