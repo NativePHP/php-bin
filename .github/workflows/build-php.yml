@@ -35,7 +35,9 @@ jobs:
           git clone https://github.com/crazywhalecc/static-php-cli.git
           cd static-php-cli
           git checkout main
-          cd ../php-bin
+          cd ../
+          [ ! -d php-bin ] && mkdir -p php-bin
+          cd php-bin
 
       - shell: bash
         run: |
@@ -118,8 +120,22 @@ jobs:
           ./bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
           cd ../php-bin
 
-      - name: Build PHP
+      - name: Patch for windows 8.4 builds
         shell: bash
+        run: |
+          cd ../static-php-cli
+          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_80.patch
+          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_81.patch
+          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_82.patch
+          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_83.patch
+          cp downloads/micro/patches/cli_static.patch downloads/micro/patches/cli_static_84.patch
+          sed -i '18d' downloads/micro/patches/cli_static_84.patch
+          sed -i 's/+1160,11/+1160,10/' downloads/micro/patches/cli_static_84.patch
+          rm -f downloads/micro/patches/cli_static.patch
+          cat downloads/micro/patches/cli_static_84.patch
+          cd ../php-bin
+
+      - name: Build PHP
         run: |
           cd ../static-php-cli
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
