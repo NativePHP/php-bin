@@ -1,5 +1,6 @@
 [
     "bcmath",
+    "bz2",
     "ctype",
     "zlib",
     "openssl",
@@ -20,6 +21,5 @@
     "simplexml",
     "sockets",
     "tokenizer",
-    "bz2",
     "zip"
 ]
