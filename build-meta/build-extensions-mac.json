@@ -1,5 +1,6 @@
 [
     "bcmath",
+    "bz2",
     "ctype",
     "curl",
     "dom",
@@ -7,6 +8,7 @@
     "filter",
     "zlib",
     "gd",
+    "iconv",
     "mbstring",
     "opcache",
     "openssl",
