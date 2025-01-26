@@ -136,6 +136,13 @@ jobs:
           fi
           echo "PHP_VERSION_FULL=$PHP_VERSION_FULL" >> $GITHUB_ENV
 
+      - name: Create bin directories
+        shell: bash
+        run: |
+          mkdir -p bin/${{ env.SPC_BUILD_OS }}/${{ env.SPC_BUILD_ARCH }}
+          mkdir -p license-files
+          mkdir -p build-meta
+
       - name: Zip PHP binary, copy metadata
         shell: bash
         run: |
