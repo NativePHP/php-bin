@@ -28,6 +28,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set SPC binary name
+        shell: bash
+        run: echo "SPC_BINARY=spc" >> $GITHUB_ENV
+
       - name: Set SPC URL for macos-13
         shell: bash
         if: matrix.os == 'macos-13'
@@ -51,16 +55,18 @@ jobs:
       - name: Set SPC URL for windows-latest
         shell: bash
         if: matrix.os == 'windows-latest'
-        run: echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-windows-x64.exe" >> $GITHUB_ENV
+        run: | 
+          echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-windows-x64.exe" >> $GITHUB_ENV
+          echo "SPC_BINARY=spc.exe" >> $GITHUB_ENV
 
       - name: Download SPC
         shell: bash
         run: |
           cd ..
-          curl -fsSL -o spc ${{ env.SPC_URL }}
-          chmod +x spc
+          curl -fsSL -o ${{ env.SPC_BINARY }} ${{ env.SPC_URL }}
+          chmod +x ${{ env.SPC_BINARY }}
           [ ! -d static-php-cli/bin ] && mkdir -p static-php-cli/bin
-          mv spc static-php-cli/bin/
+          mv ${{ env.SPC_BINARY }} static-php-cli/bin/
 
       - name: Create php-bin directory
         shell: bash
@@ -110,7 +116,7 @@ jobs:
       - name: SPC doctor
         run: |
           cd ../static-php-cli
-          ./bin/spc doctor
+          ./bin/${{ env.SPC_BINARY }} doctor
           cd ../php-bin
 
       - name: Read PHP extensions from file
@@ -133,13 +139,13 @@ jobs:
         if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
         run: |
           cd ../static-php-cli
-          ./bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+          ./bin/${{ env.SPC_BINARY }} download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
           cd ../php-bin
 
       - name: Build PHP
         run: |
           cd ../static-php-cli
-          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}"
+          ./bin/${{ env.SPC_BINARY }} build --build-cli "${{ env.PHP_EXTENSIONS }}"
           cd ../php-bin
 
       - name: Get built PHP version
