@@ -8,6 +8,9 @@
     "nghttp2",
     "curl",
     "libpng",
+    "libwebp",
+    "libjpeg",
+    "freetype",
     "sqlite",
     "xz",
     "libzip"
