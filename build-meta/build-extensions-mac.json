@@ -21,5 +21,7 @@
     "sockets",
     "tokenizer",
     "xml",
-    "zip"
+    "zip",
+    "xmlwriter",
+    "xmlreader"
 ]
