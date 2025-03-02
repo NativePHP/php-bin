@@ -6,6 +6,9 @@
     "libxml2",
     "curl",
     "libpng",
+    "libwebp",
+    "libjpeg",
+    "freetype",
     "sqlite",
     "libzip"
 ]
