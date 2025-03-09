@@ -1,4 +1,8 @@
 [
+    "pkg-config",
+    "lib-base",
+    "micro",
+    "php",
     "bzip2",
     "zlib",
     "openssl",
@@ -6,6 +10,9 @@
     "libxml2",
     "curl",
     "libpng",
+    "libwebp",
+    "libjpeg",
+    "freetype",
     "sqlite",
     "libzip"
 ]
