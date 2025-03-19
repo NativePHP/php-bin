@@ -12,6 +12,10 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
+  SPC_VERSION: 2.4.4
+  # Temporary workaround. See https://github.com/NativePHP/laravel/issues/522#issuecomment-2736250539
+  # Remove when updating SPC version
+  WINBUILD_ACKNOWLEDGE_DEPRECATED: yes
 
 jobs:
   build:
@@ -35,35 +39,40 @@ jobs:
       - name: Set SPC URL for macos-13
         shell: bash
         if: matrix.os == 'macos-13'
-        run: echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-macos-x86_64" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for macos-latest
         shell: bash
         if: matrix.os == 'macos-latest'
-        run: echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-macos-aarch64" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-aarch64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for ubuntu-latest and ubuntu-24.04
         shell: bash
         if: matrix.os == 'ubuntu-latest'
-        run: echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-linux-x86_64" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-x86_64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for ubuntu-24.04-arm
         shell: bash
         if: matrix.os == 'ubuntu-24.04-arm'
-        run: echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-linux-aarch64" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-aarch64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for windows-latest
         shell: bash
         if: matrix.os == 'windows-latest'
         run: | 
-          echo "SPC_URL=https://dl.static-php.dev/static-php-cli/spc-bin/nightly/spc-windows-x64.exe" >> $GITHUB_ENV
+          echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-windows-x64.exe" >> $GITHUB_ENV
           echo "SPC_BINARY=spc.exe" >> $GITHUB_ENV
 
       - name: Download SPC
         shell: bash
         run: |
           cd ..
-          curl -fsSL -o ${{ env.SPC_BINARY }} ${{ env.SPC_URL }}
+          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
+            curl -fsSL -o ${{ env.SPC_BINARY }} ${{ env.SPC_URL }}
+          else
+            curl -fsSL -o ${{ env.SPC_BINARY }}.tar.gz ${{ env.SPC_URL }}
+            tar -xzf ${{ env.SPC_BINARY }}.tar.gz
+          fi
           chmod +x ${{ env.SPC_BINARY }}
           [ ! -d static-php-cli/bin ] && mkdir -p static-php-cli/bin
           mv ${{ env.SPC_BINARY }} static-php-cli/bin/
@@ -149,7 +158,7 @@ jobs:
       - name: Build PHP
         run: |
           cd ../static-php-cli
-          ./bin/${{ env.SPC_BINARY }} build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}"
+          ./bin/${{ env.SPC_BINARY }} build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --debug
           cd ../php-bin
 
       - name: Get built PHP version
