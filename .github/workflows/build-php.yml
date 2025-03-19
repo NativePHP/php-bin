@@ -13,6 +13,9 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
   SPC_VERSION: 2.4.4
+  # Temporary workaround. See https://github.com/NativePHP/laravel/issues/522#issuecomment-2736250539
+  # Remove when updating SPC version
+  WINBUILD_ACKNOWLEDGE_DEPRECATED: yes
 
 jobs:
   build:
