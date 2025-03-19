@@ -12,6 +12,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
+  SPC_VERSION: 2.5.0
 
 jobs:
   build:
@@ -35,28 +36,28 @@ jobs:
       - name: Set SPC URL for macos-13
         shell: bash
         if: matrix.os == 'macos-13'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/2.5.0/spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for macos-latest
         shell: bash
         if: matrix.os == 'macos-latest'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/2.5.0/spc-macos-aarch64.tar.gz" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-aarch64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for ubuntu-latest and ubuntu-24.04
         shell: bash
         if: matrix.os == 'ubuntu-latest'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/2.5.0/spc-linux-x86_64.tar.gz" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-x86_64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for ubuntu-24.04-arm
         shell: bash
         if: matrix.os == 'ubuntu-24.04-arm'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/2.5.0/spc-linux-aarch64.tar.gz" >> $GITHUB_ENV
+        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-aarch64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for windows-latest
         shell: bash
         if: matrix.os == 'windows-latest'
         run: | 
-          echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/2.5.0/spc-windows-x64.exe" >> $GITHUB_ENV
+          echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-windows-x64.exe" >> $GITHUB_ENV
           echo "SPC_BINARY=spc.exe" >> $GITHUB_ENV
 
       - name: Download SPC
