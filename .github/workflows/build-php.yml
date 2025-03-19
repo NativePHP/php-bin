@@ -12,7 +12,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
-  SPC_VERSION: 2.5.0
+  SPC_VERSION: 2.4.5
 
 jobs:
   build:
