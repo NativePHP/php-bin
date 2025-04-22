@@ -31,43 +31,10 @@ jobs:
           echo "CHANGED=false" >> $GITHUB_ENV
         fi
 
-    - name: Commit changes
-      if: env.CHANGED == 'true'
-      run: |
-        git config --local user.email "simon.hamp@me.com"
-        git config --local user.name "Simon Hamp"
-        git add cacert.pem
-        git commit -m "Update CA file"
-        git push
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  release:
-    needs: fetch-ca-file
-    if: needs.fetch-ca-file.outputs.changed == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get the latest release
-        id: latestrelease
-        run: |
-          LATEST_VERSION=$(curl --silent "https://api.github.com/repos/${{ github.repository }}/releases/latest" \
-          | jq -r .tag_name)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Bump the patch version
-        id: bump
-        run: |
-          NEW_VERSION=$(echo "${{ steps.latestrelease.outputs.version }}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g')
-          echo "VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-
-      - name: Create a new release
-        id: create_release
-        uses: actions/create-release@v1
-        with:
-          tag_name: v${{ env.VERSION }}
-          release_name: v${{ env.VERSION }}
-          draft: true
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v7
+      with:
+        branch: update-ca-file
+        title: "Update CA file"
+        commit-message: "Update CA file"
+        base: main
