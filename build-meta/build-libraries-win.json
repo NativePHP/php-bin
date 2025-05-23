@@ -1,4 +1,7 @@
 [
+    "lib-base",
+    "micro",
+    "php",
     "bzip2",
     "zlib",
     "openssl",
