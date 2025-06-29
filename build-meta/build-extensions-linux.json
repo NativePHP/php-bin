@@ -9,6 +9,7 @@
     "zlib",
     "gd",
     "iconv",
+    "intl",
     "mbstring",
     "opcache",
     "openssl",
