@@ -11,6 +11,7 @@
     "fileinfo",
     "filter",
     "gd",
+    "intl",
     "mbstring",
     "opcache",
     "pdo",
