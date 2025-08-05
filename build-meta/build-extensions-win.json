@@ -13,6 +13,7 @@
     "gd",
     "intl",
     "mbstring",
+    "mbregex",
     "opcache",
     "pdo",
     "sqlite3",
