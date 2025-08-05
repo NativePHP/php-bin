@@ -15,6 +15,7 @@
     "libjpeg",
     "freetype",
     "icu-static-win",
+    "onig",
     "sqlite",
     "xz",
     "libzip"
