@@ -21,8 +21,8 @@ jobs:
 
     strategy:
       matrix:
-        version: ["8.3", "8.4"]
-        os: [ "macos-13", "macos-latest", "windows-latest", "ubuntu-latest", "ubuntu-24.04-arm" ]
+        version: ["8.4"]
+        os: ["windows-latest"]
 
     continue-on-error: true
 
@@ -32,26 +32,6 @@ jobs:
       - name: Set SPC binary name
         shell: bash
         run: echo "SPC_BINARY=spc" >> $GITHUB_ENV
-
-      - name: Set SPC URL for macos-13
-        shell: bash
-        if: matrix.os == 'macos-13'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
-
-      - name: Set SPC URL for macos-latest
-        shell: bash
-        if: matrix.os == 'macos-latest'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-aarch64.tar.gz" >> $GITHUB_ENV
-
-      - name: Set SPC URL for ubuntu-latest and ubuntu-24.04
-        shell: bash
-        if: matrix.os == 'ubuntu-latest'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-x86_64.tar.gz" >> $GITHUB_ENV
-
-      - name: Set SPC URL for ubuntu-24.04-arm
-        shell: bash
-        if: matrix.os == 'ubuntu-24.04-arm'
-        run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-linux-aarch64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for windows-latest
         shell: bash
@@ -90,22 +70,10 @@ jobs:
         run: echo "SPC_BUILD_ARCH=x64" >> $GITHUB_ENV
 
       - shell: bash
-        if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-24.04-arm'
-        run: echo "SPC_BUILD_ARCH=arm64" >> $GITHUB_ENV
-
-      - shell: bash
-        if: contains(matrix.os, 'macos')
-        run: |
-          brew install automake gzip
-          echo "SPC_BUILD_OS=mac" >> $GITHUB_ENV
-
-      - shell: bash
         if: matrix.os == 'windows-latest'
         run: echo "SPC_BUILD_OS=win" >> $GITHUB_ENV
 
-      - shell: bash
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'ubuntu-24.04-arm'
-        run: echo "SPC_BUILD_OS=linux" >> $GITHUB_ENV
+
 
       - name: Setup system PHP
         uses: shivammathur/setup-php@v2
