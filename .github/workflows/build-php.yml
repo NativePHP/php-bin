@@ -24,8 +24,8 @@ jobs:
         version: ["8.3", "8.4"]
         os:
           [
-            "macos-13",
             "macos-latest",
+            "macos-15-intel",
             "windows-latest",
             "ubuntu-latest",
             "ubuntu-24.04-arm",
@@ -40,9 +40,9 @@ jobs:
         shell: bash
         run: echo "SPC_BINARY=spc" >> $GITHUB_ENV
 
-      - name: Set SPC URL for macos-13
+      - name: Set SPC URL for macos-15-intel
         shell: bash
-        if: matrix.os == 'macos-13'
+        if: matrix.os == 'macos-15-intel'
         run: echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-macos-x86_64.tar.gz" >> $GITHUB_ENV
 
       - name: Set SPC URL for macos-latest
