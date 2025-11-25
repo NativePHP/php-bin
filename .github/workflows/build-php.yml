@@ -7,12 +7,12 @@ permissions:
 on:
   schedule:
     # This will run weekly on Sunday at 00:00 UTC.
-    - cron:  '0 0 * * 0'
+    - cron: "0 0 * * 0"
   workflow_dispatch:
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
-  SPC_VERSION: 2.7.1
+  SPC_VERSION: 2.7.7
 
 jobs:
   build:
@@ -22,7 +22,14 @@ jobs:
     strategy:
       matrix:
         version: ["8.3", "8.4"]
-        os: [ "macos-13", "macos-latest", "windows-latest", "ubuntu-latest", "ubuntu-24.04-arm" ]
+        os:
+          [
+            "macos-13",
+            "macos-latest",
+            "windows-latest",
+            "ubuntu-latest",
+            "ubuntu-24.04-arm",
+          ]
 
     continue-on-error: true
 
@@ -56,7 +63,7 @@ jobs:
       - name: Set SPC URL for windows-latest
         shell: bash
         if: matrix.os == 'windows-latest'
-        run: | 
+        run: |
           echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-windows-x64.exe" >> $GITHUB_ENV
           echo "SPC_BINARY=spc.exe" >> $GITHUB_ENV
 
