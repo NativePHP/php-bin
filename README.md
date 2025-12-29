@@ -30,7 +30,7 @@ extensions that are compiled in.
 
 ## Issues
 
-Please raise any issues on the [NativePHP/laravel](https://github.com/nativephp/laravel/issues/new/choose) repo.
+Please raise any issues on the [NativePHP/desktop](https://github.com/nativephp/desktop/issues/new/choose) repo.
 
 ## Credits
 
