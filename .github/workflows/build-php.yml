@@ -12,7 +12,7 @@ on:
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
-  SPC_VERSION: 2.7.1
+  SPC_VERSION: 2.8.2
 
 jobs:
   build:
@@ -56,7 +56,7 @@ jobs:
       - name: Set SPC URL for windows-latest
         shell: bash
         if: matrix.os == 'windows-latest'
-        run: | 
+        run: |
           echo "SPC_URL=https://github.com/crazywhalecc/static-php-cli/releases/download/${{ env.SPC_VERSION }}/spc-windows-x64.exe" >> $GITHUB_ENV
           echo "SPC_BINARY=spc.exe" >> $GITHUB_ENV
 
