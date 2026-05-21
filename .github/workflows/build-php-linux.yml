@@ -8,6 +8,16 @@ on:
   schedule:
     - cron: '0 0 * * 5'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'PHP version to build'
+        type: choice
+        options:
+          - all
+          - "8.3"
+          - "8.4"
+          - "8.5"
+        default: all
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
@@ -22,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["8.3", "8.4", "8.5"]
+        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
         os: [ubuntu-latest, ubuntu-24.04-arm]
         include:
           - os: ubuntu-latest

@@ -8,6 +8,16 @@ on:
   schedule:
     - cron: '0 0 * * 5'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'PHP version to build'
+        type: choice
+        options:
+          - all
+          - "8.3"
+          - "8.4"
+          - "8.5"
+        default: all
 
 env:
   GITHUB_TOKEN: ${{ secrets.PAT }}
@@ -22,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["8.3", "8.4", "8.5"]
+        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
         os: [windows-2025]
         include:
           - os: windows-2025
@@ -95,6 +105,18 @@ jobs:
           cp "zstd-${ZSTD_VERSION}-win64/static/libzstd_static.lib" static-php-cli/buildroot/lib/libzstd.lib
           cp "zstd-${ZSTD_VERSION}-win64/include/"*.h static-php-cli/buildroot/include/
           rm -rf zstd.zip "zstd-${ZSTD_VERSION}-win64"
+
+      # SPC's bundled icu-static-win is ICU 78, whose headers require C++17.
+      # PHP 8.3's ext/intl/config.w32 doesn't pass /std:c++17 to MSVC (8.4+
+      # does), so intl_convertcpp.cpp fails to compile. Extract php-src
+      # manually and patch in /std:c++17 before SPC runs the build.
+      - name: Patch PHP 8.3 ext/intl for C++17 (ICU 78 compatibility)
+        if: matrix.version == '8.3'
+        shell: bash
+        run: |
+          cd ../static-php-cli
+          ./bin/spc.exe extract php-src
+          sed -i 's|"/EHsc /DUNISTR_FROM_CHAR_EXPLICIT|"/std:c++17 /EHsc /DUNISTR_FROM_CHAR_EXPLICIT|' source/php-src/ext/intl/config.w32
 
       - name: Build PHP
         run: |
