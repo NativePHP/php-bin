@@ -21,6 +21,7 @@
     "session",
     "simplexml",
     "sockets",
+    "sodium",
     "tokenizer",
     "xml",
     "zip"
