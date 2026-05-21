@@ -1,10 +1,12 @@
 [
     "lib-base",
     "micro",
+    "frankenphp",
     "php",
     "bzip2",
     "zlib",
     "openssl",
+    "brotli",
     "libssh2",
     "libiconv-win",
     "libxml2",
@@ -17,6 +19,7 @@
     "icu-static-win",
     "onig",
     "sqlite",
+    "libsodium",
     "xz",
     "libzip"
 ]
