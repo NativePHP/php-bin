@@ -14,7 +14,7 @@ backward-compatible with its manifest shape.
 ## 1. Manifest URL
 
 ```
-https://bin.nativephp.com/{branch}/versions.json
+https://bin.nativephp.com/{branch}/desktop/versions.json
 ```
 
 - `{branch}` is the git branch the build ran on (`github.ref_name`), e.g. `main`.
@@ -22,7 +22,7 @@ https://bin.nativephp.com/{branch}/versions.json
 - The desktop consumer selects the branch via `NATIVEPHP_BIN_BRANCH`
   (default `main`) — identical to mobile's
   `nativephp-mobile-air/src/Traits/InstallsAndroid.php::getBinaryBranch()`.
-- Production manifest: `https://bin.nativephp.com/main/versions.json`.
+- Production manifest: `https://bin.nativephp.com/main/desktop/versions.json`.
 
 The manifest is uploaded **last** (after every binary it references), with
 `Cache-Control: no-cache, no-store` so consumers always see the current set.
@@ -50,12 +50,12 @@ An entry is **either** a plain URL string (mobile-compatible) **or** an object:
 
 ```jsonc
 // Rich object form (what this producer emits):
-{ "url": "https://bin.nativephp.com/main/mac/arm64/php-8.3.zip",
+{ "url": "https://bin.nativephp.com/main/desktop/mac/arm64/php-8.3.zip",
   "sha256": "3f1c...e9",          // hex SHA-256 of the zip; verify after download
   "size": 24563319 }              // exact byte size of the zip
 
 // Plain-string form (also valid; mobile manifests use this):
-"https://bin.nativephp.com/main/mac/arm64/php-8.3.zip"
+"https://bin.nativephp.com/main/desktop/mac/arm64/php-8.3.zip"
 ```
 
 Consumers MUST accept both forms: if an entry is a string, treat it as `url` with
@@ -73,12 +73,12 @@ entries today, but consumers must iterate it.
   "updated_at": "2026-06-22T00:00:00Z",
   "versions": {
     "8.3": {
-      "mac-arm64":  [ { "url": "https://bin.nativephp.com/main/mac/arm64/php-8.3.zip",  "sha256": "<hex>", "size": 24563319 } ],
-      "mac-x64":    [ { "url": "https://bin.nativephp.com/main/mac/x64/php-8.3.zip",    "sha256": "<hex>", "size": 24550111 } ],
+      "mac-arm64":  [ { "url": "https://bin.nativephp.com/main/desktop/mac/arm64/php-8.3.zip",  "sha256": "<hex>", "size": 24563319 } ],
+      "mac-x64":    [ { "url": "https://bin.nativephp.com/main/desktop/mac/x64/php-8.3.zip",    "sha256": "<hex>", "size": 24550111 } ],
       "mac-x86":    [],
-      "linux-x64":  [ { "url": "https://bin.nativephp.com/main/linux/x64/php-8.3.zip",  "sha256": "<hex>", "size": 23994607 } ],
-      "linux-arm64":[ { "url": "https://bin.nativephp.com/main/linux/arm64/php-8.3.zip","sha256": "<hex>", "size": 24407355 } ],
-      "win-x64":    [ { "url": "https://bin.nativephp.com/main/win/x64/php-8.3.zip",    "sha256": "<hex>", "size": 24196039 } ]
+      "linux-x64":  [ { "url": "https://bin.nativephp.com/main/desktop/linux/x64/php-8.3.zip",  "sha256": "<hex>", "size": 23994607 } ],
+      "linux-arm64":[ { "url": "https://bin.nativephp.com/main/desktop/linux/arm64/php-8.3.zip","sha256": "<hex>", "size": 24407355 } ],
+      "win-x64":    [ { "url": "https://bin.nativephp.com/main/desktop/win/x64/php-8.3.zip",    "sha256": "<hex>", "size": 24196039 } ]
     },
     "8.4": { "...": "..." },
     "8.5": { "...": "..." }
@@ -126,18 +126,18 @@ Cloudflare R2 setup the mobile pipeline uses; S3 endpoint
 `nativephplibs`).
 
 ```
-bin.nativephp.com/{branch}/{os}/{arch}/php-{phpVersion}.zip          # binary  (immutable)
-bin.nativephp.com/{branch}/{os}/{arch}/php-{phpVersion}.zip.sha256   # checksum sidecar
-bin.nativephp.com/{branch}/versions.json                             # manifest (short TTL)
+bin.nativephp.com/{branch}/desktop/{os}/{arch}/php-{phpVersion}.zip          # binary  (immutable)
+bin.nativephp.com/{branch}/desktop/{os}/{arch}/php-{phpVersion}.zip.sha256   # checksum sidecar
+bin.nativephp.com/{branch}/desktop/versions.json                             # manifest (short TTL)
 ```
 
 Examples:
 
 ```
-bin.nativephp.com/main/mac/arm64/php-8.3.zip
-bin.nativephp.com/main/mac/arm64/php-8.3.zip.sha256
-bin.nativephp.com/main/win/x64/php-8.5.zip
-bin.nativephp.com/main/versions.json
+bin.nativephp.com/main/desktop/mac/arm64/php-8.3.zip
+bin.nativephp.com/main/desktop/mac/arm64/php-8.3.zip.sha256
+bin.nativephp.com/main/desktop/win/x64/php-8.5.zip
+bin.nativephp.com/main/desktop/versions.json
 ```
 
 - The path mirrors the original in-repo `bin/<os>/<arch>/php-<ver>.zip` layout,

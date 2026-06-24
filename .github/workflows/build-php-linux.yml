@@ -143,7 +143,7 @@ jobs:
           AWS_DEFAULT_REGION: auto
         run: |
           ZIP="bin/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
-          DEST="${R2_PREFIX}${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
+          DEST="${R2_PREFIX}desktop/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
 
           # Compute the checksum and upload it as a sidecar first.
           SHA=$(sha256sum "$ZIP" | awk '{print $1}')
@@ -187,7 +187,7 @@ jobs:
           cat versions.json
 
           # Manifest LAST, after every binary it references is already in R2.
-          aws s3 cp versions.json "s3://${R2_BUCKET}/${R2_PREFIX}versions.json" \
+          aws s3 cp versions.json "s3://${R2_BUCKET}/${R2_PREFIX}desktop/versions.json" \
             --endpoint-url "$R2_ENDPOINT" \
             --content-type "application/json" \
             --cache-control "no-cache, no-store"

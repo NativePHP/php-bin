@@ -89,7 +89,7 @@ if [ -n "${LOCAL_BIN_DIR:-}" ]; then
       if [ -f "$ZIP" ]; then
         SHA=$(sha256_of "$ZIP")
         SIZE=$(wc -c < "$ZIP" | tr -d ' ')
-        URL="${BASE_URL}/${R2_PREFIX:-main/}${PATH_SEG}/php-${VER}.zip"
+        URL="${BASE_URL}/${R2_PREFIX:-main/}desktop/${PATH_SEG}/php-${VER}.zip"
         ENTRIES=$(jq -n --arg url "$URL" --arg sha "$SHA" --argjson size "$SIZE" \
           '[{url: $url, sha256: $sha, size: $size}]')
       fi
@@ -115,7 +115,7 @@ for VER in "${PHP_VERSIONS[@]}"; do
   JSON=$(echo "$JSON" | jq --arg v "$VER" '.versions[$v] = {}')
   for KEY in "${PLATFORM_KEYS[@]}"; do
     PATH_SEG=$(key_to_path "$KEY")
-    OBJ_KEY="${R2_PREFIX}${PATH_SEG}/php-${VER}.zip"
+    OBJ_KEY="${R2_PREFIX}desktop/${PATH_SEG}/php-${VER}.zip"
 
     # Find the object's size from the listing (4th column onward is the key).
     SIZE=$(echo "$LISTING" | awk -v k="$OBJ_KEY" '$4 == k {print $3}' | head -n1)
