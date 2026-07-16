@@ -1,3 +1,13 @@
 .DS_Store
 .idea
 vendor
+
+# Slim-forward (see docs/r2-binaries-contract.md): built PHP binaries now live
+# on Cloudflare R2 (bin.nativephp.com), not in git. Stop committing them going
+# forward while keeping the bin/ directory layout intact (.gitkeep files).
+# NOTE: this does NOT remove the zips already in history — a later 2.0 drops
+# bin/ entirely. No history rewrite is performed here.
+bin/**/*.zip
+bin/**/*.zip.sha256
+# Manifest is generated in CI and uploaded to R2; never commit it.
+versions.json

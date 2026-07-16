@@ -1,11 +1,15 @@
 name: Build PHP (macOS)
 
+# Required repository secrets (same names as nativephp-php-bin-mobile):
+#   R2_ACCESS_KEY_ID      - Cloudflare R2 access key
+#   R2_SECRET_ACCESS_KEY  - Cloudflare R2 secret key
+
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 on:
   schedule:
+    # Every Friday at midnight UTC (matches the mobile build trigger).
     - cron: '0 0 * * 5'
   workflow_dispatch:
     inputs:
@@ -20,9 +24,12 @@ on:
         default: all
 
 env:
-  GITHUB_TOKEN: ${{ secrets.PAT }}
   SPC_VERSION: 2.8.5
   SPC_BUILD_OS: mac
+  # Each branch uploads to its own directory: main/, feature-x/, etc.
+  R2_PREFIX: ${{ format('{0}/', github.ref_name) }}
+  R2_ENDPOINT: https://713f4e1d515cf082921cdf5122bf1739.r2.cloudflarestorage.com
+  R2_BUCKET: nativephplibs
 
 jobs:
   build:
@@ -128,15 +135,62 @@ jobs:
           cp ../static-php-cli/buildroot/build-extensions.json build-meta/build-extensions-${{ env.SPC_BUILD_OS }}.json
           cp ../static-php-cli/buildroot/build-libraries.json build-meta/build-libraries-${{ env.SPC_BUILD_OS }}.json
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v8
-        with:
-          branch: update-php-${{ matrix.version }}-${{ env.SPC_BUILD_OS }}-${{ matrix.arch }}
-          title: "Update PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ matrix.arch }}"
-          commit-message: "Update PHP ${{ matrix.version }} build for ${{ env.SPC_BUILD_OS }} ${{ matrix.arch }}"
-          body: |
-            PHP: ${{ env.PHP_VERSION_FULL }}
-            Exts: ${{ env.PHP_EXTENSIONS }}
-            OS: ${{ env.SPC_BUILD_OS }}
-            Arch: ${{ matrix.arch }}
-          base: main
+      # Upload the built zip (and a sha256 sidecar) to R2 instead of committing
+      # it to git. Mirrors nativephp-php-bin-mobile/.github/workflows/build.yml:
+      # same `aws s3 cp` tooling, R2_* secrets, endpoint and --cache-control.
+      - name: Upload to R2
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+        run: |
+          ZIP="bin/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
+          DEST="${R2_PREFIX}desktop/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
+
+          # Compute the checksum and upload it as a sidecar first.
+          SHA=$(shasum -a 256 "$ZIP" | awk '{print $1}')
+          echo "$SHA  $(basename "$ZIP")" > "$ZIP.sha256"
+
+          echo "Uploading $ZIP -> ${DEST} (sha256=$SHA)"
+          aws s3 cp "$ZIP" "s3://${R2_BUCKET}/${DEST}" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --cache-control "public, max-age=31536000, immutable"
+
+          aws s3 cp "$ZIP.sha256" "s3://${R2_BUCKET}/${DEST}.sha256" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type "text/plain" \
+            --cache-control "public, max-age=31536000, immutable"
+
+  # Regenerate the branch manifest from everything currently in R2. Runs after
+  # all build jobs; safe because it lists the whole bucket prefix, so it always
+  # reflects every platform/version actually uploaded (mac, linux, win).
+  manifest:
+    needs: build
+    # Run even if some matrix legs failed, so the manifest still reflects the
+    # binaries that DID upload. Skip only on cancellation. The generator lists
+    # the live bucket, so it never references a missing object.
+    if: always() && needs.build.result != 'cancelled'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Generate and upload versions.json
+        shell: bash
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: auto
+          BUCKET: ${{ env.R2_BUCKET }}
+          BASE_URL: https://bin.nativephp.com
+        run: |
+          chmod +x .github/scripts/generate-versions-json.sh
+          .github/scripts/generate-versions-json.sh > versions.json
+          echo "versions.json:"
+          cat versions.json
+
+          # Manifest LAST, after every binary it references is already in R2.
+          aws s3 cp versions.json "s3://${R2_BUCKET}/${R2_PREFIX}desktop/versions.json" \
+            --endpoint-url "$R2_ENDPOINT" \
+            --content-type "application/json" \
+            --cache-control "no-cache, no-store"
