@@ -266,21 +266,27 @@ real domain before any slimming or history surgery.
 
 ---
 
-## 6. Open questions
-- **R2 specifics:** exact bucket name, account ID, and whether desktop reuses the existing
-  `bin.nativephp.com` (mobile) or gets its own subdomain. Which Cloudflare account owns it; where do the
-  `R2_*` secrets live?
-- **Public vs presigned:** confirmed public is fine (binaries are open-source artifacts)? Assume yes.
-- **Versioning/manifest:** one shared `versions.json` for mobile+desktop, or a separate desktop manifest?
-  Adopt mobile's `{branch}/versions.json` + `NATIVEPHP_BIN_BRANCH` convention as-is?
-- **Matrix to host:** ship `mac/x86`? It's empty today — drop it. Confirm only the 15 active combos
-  (mac x64/arm64, linux x64/arm64, win x64 × 8.3/8.4/8.5). Add win/arm64 later?
-- **Upload trigger:** on push-to-main (per build PR merge), on release tag, or both?
+## 6. Decisions & open questions
+
+### Decided
+- **R2 specifics:** desktop **reuses** the existing mobile R2 setup — bucket `nativephplibs`,
+  account `713f4e1d515cf082921cdf5122bf1739`, domain `bin.nativephp.com`. `R2_*` secrets live in the
+  `NativePHP/php-bin` GitHub Actions secrets (`R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`).
+- **Public vs presigned:** public (binaries are open-source artifacts).
+- **Versioning/manifest:** desktop gets its **own separate manifest** at `{branch}/desktop/versions.json`
+  — mobile and desktop serve different purposes and are not merged. `NATIVEPHP_BIN_BRANCH` convention adopted.
+- **Matrix to host:** the 15 active combos (mac x64/arm64, linux x64/arm64, win x64 × 8.3/8.4/8.5). The
+  `mac-x86` slot is kept but empty; missing builds are ignored (CI fills R2 on its next run). `win/arm64` later.
+- **Checksum source of truth:** sha256 generated in CI at upload time, written into the manifest (+ `.sha256` sidecar).
+- **Supply-chain integrity** (manifest/binary signing): deferred — sha256-from-origin for now, revisit later.
+
+### Still open
+- **Upload trigger:** the CI workflows currently upload on their existing build trigger; confirm whether to
+  also publish on release tags.
 - **Git-history slimming approach:** `git filter-repo`/BFG rewrite (smallest repo, breaks SHAs) vs fresh
-  history vs leave history and only slim going forward. Team appetite for a force-push?
+  history vs leave history and only slim going forward. Deferred (high blast radius); do last.
 - **PHP version source:** desktop derives the version from host PHP; mobile derives from `composer.json`
   `require.php`. Keep them divergent or unify?
-- **Checksum source of truth:** generate sha256 in CI at upload time and write into the manifest — confirm.
 
 ## 7. Risks
 - **History rewrite is destructive:** force-push invalidates every existing clone/fork and rewrites SHAs;

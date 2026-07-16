@@ -197,20 +197,20 @@ stored in the repo. (The previous `PAT` secret used by the now-removed
 
 ---
 
-## 7. Notes / open questions for the consumer half
+## 7. Notes / decisions for the consumer half
 
-- **Shared `versions.json` collision:** mobile and desktop both write
-  `{branch}/versions.json` but with different shapes
-  (`versions[minor].{android,ios}` vs `versions[minor][platformKey]`). As written,
-  whichever pipeline runs last overwrites the other's manifest. Resolve by one of:
-  a distinct desktop manifest path (e.g. `{branch}/desktop/versions.json` or
-  `{branch}/versions-desktop.json`), or a **merged** manifest where the manifest
-  generator reads the existing object and merges desktop keys into it. **This
-  producer currently writes the desktop-only manifest to
-  `{branch}/versions.json`** — confirm the desired path before going live.
-- **Bucket / account / endpoint** (`nativephplibs`,
-  `713f4e1d515cf082921cdf5122bf1739`) are copied from the mobile workflow; confirm
-  desktop is meant to share that exact bucket and account.
+- **Separate desktop manifest (DECIDED):** desktop and mobile manifests are kept
+  **fully separate** — they serve different purposes. Desktop writes its own
+  manifest to **`{branch}/desktop/versions.json`** (shape
+  `versions[minor][platformKey]`); mobile's `{branch}/versions.json`
+  (`versions[minor].{android,ios}`) is left untouched. There is no shared/merged
+  manifest and no collision: the two paths never overlap. This producer already
+  writes to `{branch}/desktop/versions.json`.
+- **Shared bucket (DECIDED):** desktop shares the mobile Cloudflare R2 bucket
+  `nativephplibs` (account `713f4e1d515cf082921cdf5122bf1739`,
+  domain `bin.nativephp.com`) and the general `{branch}/desktop/...` folder
+  structure. Binary paths (`{branch}/desktop/{os}/{arch}/...`) never collide with
+  mobile's `{branch}/{minor}/...`, so co-tenanting the bucket is fine.
 - **Consumer integrity check:** verify the downloaded zip's SHA-256 against the
   manifest `sha256`; on mismatch, delete and fail. Keep mobile's "is it a real
   zip?" `ZipArchive` open-check as a backstop for plain-string entries.
