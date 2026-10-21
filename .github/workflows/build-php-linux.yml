@@ -148,12 +148,12 @@ jobs:
           echo "Uploading $ZIP -> ${DEST} (sha256=$SHA)"
           aws s3 cp "$ZIP" "s3://${R2_BUCKET}/${DEST}" \
             --endpoint-url "$R2_ENDPOINT" \
-            --cache-control "public, max-age=31536000, immutable"
+            --cache-control "no-cache, no-store"
 
           aws s3 cp "$ZIP.sha256" "s3://${R2_BUCKET}/${DEST}.sha256" \
             --endpoint-url "$R2_ENDPOINT" \
             --content-type "text/plain" \
-            --cache-control "public, max-age=31536000, immutable"
+            --cache-control "no-cache, no-store"
 
   # Regenerate the branch manifest from everything currently in R2. Runs after
   # all build jobs; safe because it lists the whole bucket prefix, so it always

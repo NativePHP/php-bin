@@ -126,7 +126,7 @@ Cloudflare R2 setup the mobile pipeline uses; S3 endpoint
 `nativephplibs`).
 
 ```
-bin.nativephp.com/{branch}/desktop/{os}/{arch}/php-{phpVersion}.zip          # binary  (immutable)
+bin.nativephp.com/{branch}/desktop/{os}/{arch}/php-{phpVersion}.zip          # binary  (no-cache)
 bin.nativephp.com/{branch}/desktop/{os}/{arch}/php-{phpVersion}.zip.sha256   # checksum sidecar
 bin.nativephp.com/{branch}/desktop/versions.json                             # manifest (short TTL)
 ```
@@ -144,9 +144,11 @@ bin.nativephp.com/main/desktop/versions.json
   so nothing about the directory structure changes — only the storage location.
 - Each zip contains a single static-php-cli binary named `php` (or `php.exe` on
   Windows), unchanged from the committed-zip era.
-- `*.zip` and `*.zip.sha256` objects are immutable
-  (`Cache-Control: public, max-age=31536000, immutable`); `versions.json` is
-  `no-cache, no-store`.
+- Every object, zips and sidecars included, is uploaded with
+  `Cache-Control: no-cache, no-store`, same as mobile. The keys only carry the
+  PHP minor, so each weekly build overwrites them; a long edge TTL would keep
+  serving the previous binary after a security release, with a sha256 that no
+  longer matches the manifest.
 - The `.sha256` sidecar holds the hex digest followed by the filename
   (`<sha256>  php-8.3.zip`), i.e. the standard `sha256sum` output line. The
   manifest copies just the hex digest into each entry's `sha256` field.
