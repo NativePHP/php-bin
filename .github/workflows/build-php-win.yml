@@ -25,6 +25,9 @@ on:
 
 env:
   SPC_VERSION: 2.8.5
+  # static-php-cli sends this with its GitHub API calls (pre-built libs come
+  # from GitHub releases). Without it, macOS runners get rate-limited (403).
+  GITHUB_TOKEN: ${{ github.token }}
   SPC_BUILD_OS: win
   # Each branch uploads to its own directory: main/, feature-x/, etc.
   R2_PREFIX: ${{ format('{0}/', github.ref_name) }}
@@ -40,9 +43,11 @@ jobs:
       fail-fast: false
       matrix:
         version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
-        os: [windows-2025]
+        # windows-2025 now ships VS 2026 only, and SPC 2.8.5's doctor only
+        # finds VS 2019/2022. Stay on windows-2022 until SPC supports VS 2026.
+        os: [windows-2022]
         include:
-          - os: windows-2025
+          - os: windows-2022
             arch: x64
             spc_asset: spc-windows-x64.exe
 
@@ -72,21 +77,13 @@ jobs:
       - name: Read PHP extensions and libraries
         run: |
           $extensions = php -r "echo trim(file_get_contents('php-extensions.txt'));"
-          $env:EXTENSIONS = $extensions
-          $extHash = php -r "echo md5(getenv('EXTENSIONS'));"
           $libraries = php -r "echo trim(file_get_contents('php-libraries.txt'));"
           Add-Content -Path $env:GITHUB_ENV -Value "PHP_EXTENSIONS=$extensions"
-          Add-Content -Path $env:GITHUB_ENV -Value "PHP_EXT_HASH=$extHash"
           Add-Content -Path $env:GITHUB_ENV -Value "PHP_LIBS=$libraries"
 
-      - id: cache-spc-downloads
-        uses: actions/cache@v5
-        with:
-          path: ../static-php-cli/downloads
-          key: spc-downloads-${{ env.PHP_EXT_HASH }}
-
+      # No cache here on purpose: each run must pull the latest php-src patch
+      # release, and a restored cache would silently rebuild an old one.
       - name: Download PHP extension sources
-        if: steps.cache-spc-downloads.outputs.cache-hit != 'true'
         run: |
           cd ../static-php-cli
           ./bin/spc.exe download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
@@ -143,7 +140,7 @@ jobs:
       # it to git. Mirrors nativephp-php-bin-mobile/.github/workflows/build.yml:
       # same `aws s3 cp` tooling, R2_* secrets, endpoint and --cache-control.
       # Runs under Git Bash (`shell: bash`) so the same script works as on
-      # mac/linux; the windows-2025 runner ships both `aws` and `sha256sum`.
+      # mac/linux; the windows-2022 runner ships both `aws` and `sha256sum`.
       - name: Upload to R2
         shell: bash
         env:

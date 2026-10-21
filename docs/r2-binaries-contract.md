@@ -110,7 +110,7 @@ from the host PHP (`PHP_MAJOR_VERSION.PHP_MINOR_VERSION`) at build time.
 | `mac-x86`     | mac   | x86   | (slot reserved, empty today) |
 | `linux-x64`   | linux | x64   | `ubuntu-latest`              |
 | `linux-arm64` | linux | arm64 | `ubuntu-24.04-arm`           |
-| `win-x64`     | win   | x64   | `windows-2025`               |
+| `win-x64`     | win   | x64   | `windows-2022`               |
 
 `os` ∈ {`mac`, `linux`, `win`}; `arch` ∈ {`arm64`, `x64`, `x86`}. The os/arch
 naming matches the in-repo `bin/<os>/<arch>/` layout exactly (so a consumer can
