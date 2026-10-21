@@ -174,13 +174,18 @@ Same trigger as the mobile build (`nativephp-php-bin-mobile/.github/workflows/bu
 Per-platform workflows (`build-php-mac.yml`, `build-php-linux.yml`,
 `build-php-win.yml`) each:
 
-1. Build the zip with static-php-cli (unchanged).
-2. **Upload binaries FIRST** (`aws s3 cp` to the R2 S3 endpoint) — the zip and its
-   `.sha256` sidecar.
-3. A dependent `manifest` job regenerates `versions.json` from the **full R2
-   listing** (so it reflects every platform actually present) and uploads it
-   **LAST**. This ordering guarantees the manifest never points at a
-   not-yet-uploaded object.
+1. Build the zip with static-php-cli (unchanged) and save it as a workflow
+   artifact laid out as `desktop/{os}/{arch}/php-{phpVersion}.zip`.
+2. A dependent `publish` job downloads those artifacts and **uploads binaries
+   FIRST** (`aws s3 cp` to the R2 S3 endpoint), each zip with its `.sha256`
+   sidecar.
+3. The same job then regenerates `versions.json` from the **full R2 listing**
+   (so it reflects every platform actually present) and uploads it **LAST**.
+   This ordering guarantees the manifest never points at a not-yet-uploaded
+   object.
+
+Because only `publish` talks to R2, a failed upload can be retried with
+"Re-run failed jobs" without rebuilding PHP (artifacts are kept for 7 days).
 
 There is also a manual `build-php.yml` orchestrator (`workflow_dispatch` only)
 covering the whole matrix in one run, with the same upload + manifest behavior.

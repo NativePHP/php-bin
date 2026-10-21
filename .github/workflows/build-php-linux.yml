@@ -95,7 +95,7 @@ jobs:
       - name: Download PHP extension sources
         run: |
           cd ../static-php-cli
-          ./bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built
+          ./bin/spc download --with-php=${{ matrix.version }} --for-extensions "${{ env.PHP_EXTENSIONS }}" --prefer-pre-built --retry=3
 
       - name: Build PHP
         run: |
@@ -128,52 +128,69 @@ jobs:
           cp ../static-php-cli/buildroot/build-extensions.json build-meta/build-extensions-${{ env.SPC_BUILD_OS }}.json
           cp ../static-php-cli/buildroot/build-libraries.json build-meta/build-libraries-${{ env.SPC_BUILD_OS }}.json
 
-      # Upload the built zip (and a sha256 sidecar) to R2 instead of committing
-      # it to git. Mirrors nativephp-php-bin-mobile/.github/workflows/build.yml:
-      # same `aws s3 cp` tooling, R2_* secrets, endpoint and --cache-control.
-      - name: Upload to R2
+      # Hand the zip to the publish job rather than uploading from here. The
+      # dist/ layout matches the R2 keys under {branch}/.
+      - name: Stage zip for publishing
         shell: bash
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
         run: |
-          ZIP="bin/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
-          DEST="${R2_PREFIX}desktop/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip"
+          mkdir -p "dist/desktop/${SPC_BUILD_OS}/${{ matrix.arch }}"
+          cp "bin/${SPC_BUILD_OS}/${{ matrix.arch }}/php-${{ matrix.version }}.zip" "dist/desktop/${SPC_BUILD_OS}/${{ matrix.arch }}/"
 
-          # Compute the checksum and upload it as a sidecar first.
-          SHA=$(sha256sum "$ZIP" | awk '{print $1}')
-          echo "$SHA  $(basename "$ZIP")" > "$ZIP.sha256"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: php-${{ env.SPC_BUILD_OS }}-${{ matrix.arch }}-${{ matrix.version }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+          # A re-run of this leg replaces the zip from the earlier attempt.
+          overwrite: true
 
-          echo "Uploading $ZIP -> ${DEST} (sha256=$SHA)"
-          aws s3 cp "$ZIP" "s3://${R2_BUCKET}/${DEST}" \
-            --endpoint-url "$R2_ENDPOINT" \
-            --cache-control "no-cache, no-store"
-
-          aws s3 cp "$ZIP.sha256" "s3://${R2_BUCKET}/${DEST}.sha256" \
-            --endpoint-url "$R2_ENDPOINT" \
-            --content-type "text/plain" \
-            --cache-control "no-cache, no-store"
-
-  # Regenerate the branch manifest from everything currently in R2. Runs after
-  # all build jobs; safe because it lists the whole bucket prefix, so it always
-  # reflects every platform/version actually uploaded (mac, linux, win).
-  manifest:
+  # Push every zip the build legs produced to R2, then regenerate the manifest
+  # from the full bucket listing and upload it last, so it never points at a
+  # missing object. This lives apart from the builds so a failed upload (bad
+  # R2 credentials, say) can be re-run on its own without rebuilding PHP.
+  publish:
     needs: build
-    # Run even if some matrix legs failed, so the manifest still reflects the
-    # binaries that DID upload. Skip only on cancellation. The generator lists
-    # the live bucket, so it never references a missing object.
+    # Run even if some matrix legs failed, so whatever did build still ships.
     if: always() && needs.build.result != 'cancelled'
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
     steps:
       - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v8
+        with:
+          pattern: php-*
+          path: dist
+          merge-multiple: true
+
+      - name: Upload binaries to R2
+        shell: bash
+        run: |
+          shopt -s nullglob
+          cd dist
+          for ZIP in desktop/*/*/*.zip; do
+            DEST="${R2_PREFIX}${ZIP}"
+            SHA=$(sha256sum "$ZIP" | awk '{print $1}')
+            echo "$SHA  $(basename "$ZIP")" > "$ZIP.sha256"
+
+            echo "Uploading $ZIP -> ${DEST} (sha256=$SHA)"
+            aws s3 cp "$ZIP" "s3://${R2_BUCKET}/${DEST}" \
+              --endpoint-url "$R2_ENDPOINT" \
+              --cache-control "no-cache, no-store"
+
+            aws s3 cp "$ZIP.sha256" "s3://${R2_BUCKET}/${DEST}.sha256" \
+              --endpoint-url "$R2_ENDPOINT" \
+              --content-type "text/plain" \
+              --cache-control "no-cache, no-store"
+          done
 
       - name: Generate and upload versions.json
         shell: bash
         env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: auto
           BUCKET: ${{ env.R2_BUCKET }}
           BASE_URL: https://bin.nativephp.com
         run: |
@@ -182,7 +199,6 @@ jobs:
           echo "versions.json:"
           cat versions.json
 
-          # Manifest LAST, after every binary it references is already in R2.
           aws s3 cp versions.json "s3://${R2_BUCKET}/${R2_PREFIX}desktop/versions.json" \
             --endpoint-url "$R2_ENDPOINT" \
             --content-type "application/json" \
