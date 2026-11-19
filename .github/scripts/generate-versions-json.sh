@@ -51,7 +51,7 @@
 set -euo pipefail
 
 # PHP minor versions and platform slots we publish.
-PHP_VERSIONS=("8.3" "8.4" "8.5")
+PHP_VERSIONS=("8.3" "8.4" "8.5" "8.6")
 # platformKey = "{os}-{arch}".  Order is stable; mac-x86 is intentionally kept.
 PLATFORM_KEYS=("mac-arm64" "mac-x64" "mac-x86" "linux-x64" "linux-arm64" "win-x64")
 

@@ -21,6 +21,7 @@ on:
           - "8.3"
           - "8.4"
           - "8.5"
+          - "8.6"
         default: all
 
 env:
@@ -42,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
+        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5","8.6"]' || format('["{0}"]', github.event.inputs.version)) }}
         os: [macos-15-intel, macos-latest]
         include:
           - os: macos-15-intel
