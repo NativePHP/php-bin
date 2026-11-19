@@ -9,8 +9,11 @@
 // oldest (_80) files, which don't apply.
 //
 // For 8.6, rewrite SPC_MICRO_PATCHES to name the newest versioned patch phpmicro has
-// for each entry (cli_checks_85, win32_85, ...). patchMicro() reads the variable after
+// for each entry (win32_85, cli_static_85, ...). patchMicro() reads the variable after
 // this point and uses an exact file name as is. 8.3 to 8.5 are untouched.
+//
+// cli_checks is dropped: even its _85 file doesn't apply to 8.6, and all it does is make
+// sapi name checks treat "micro" like "cli". We only build the CLI, so it changes nothing.
 //
 // Remove this once SPC supports 8.6.
 
@@ -27,6 +30,10 @@ $names = array_filter(array_map('trim', explode(',', (string) getenv('SPC_MICRO_
 $resolved = [];
 
 foreach ($names as $name) {
+    if ($name === 'cli_checks') {
+        continue;
+    }
+
     if (file_exists("{$dir}/{$name}.patch")) {
         $resolved[] = $name;
         continue;
