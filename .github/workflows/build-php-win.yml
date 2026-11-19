@@ -119,7 +119,7 @@ jobs:
       - name: Build PHP
         run: |
           cd ../static-php-cli
-          ./bin/spc.exe build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}\.github\spc-patches\skip-phpmicro.php" --with-added-patch="${{ github.workspace }}\.github\spc-patches\libwebp-mux-windows.php" --debug
+          ./bin/spc.exe build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}\.github\spc-patches\phpmicro-patches-86.php" --with-added-patch="${{ github.workspace }}\.github\spc-patches\libwebp-mux-windows.php" --debug
 
       - name: Get built PHP version
         run: |

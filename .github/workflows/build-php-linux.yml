@@ -107,7 +107,7 @@ jobs:
           if [ "${{ matrix.version }}" = "8.6" ]; then
             export SPC_CMD_PREFIX_PHP_CONFIGURE="./configure --prefix= --with-valgrind=no --disable-shared --enable-static --disable-all --disable-phpdbg --enable-pic"
           fi
-          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}/.github/spc-patches/skip-phpmicro.php" --debug
+          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}/.github/spc-patches/phpmicro-patches-86.php" --debug
 
       - name: Get built PHP version
         shell: bash

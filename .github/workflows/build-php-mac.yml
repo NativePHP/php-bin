@@ -104,7 +104,7 @@ jobs:
       - name: Build PHP
         run: |
           cd ../static-php-cli
-          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}/.github/spc-patches/skip-phpmicro.php" --debug
+          ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}/.github/spc-patches/phpmicro-patches-86.php" --debug
 
       - name: Get built PHP version
         shell: bash
