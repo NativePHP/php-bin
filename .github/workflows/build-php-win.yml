@@ -21,6 +21,7 @@ on:
           - "8.3"
           - "8.4"
           - "8.5"
+          - "8.6"
         default: all
 
 env:
@@ -42,8 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # No 8.6 yet: its GD needs libwebpmux, which SPC 2.8.5 builds without on Windows.
-        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
+        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5","8.6"]' || format('["{0}"]', github.event.inputs.version)) }}
         # windows-2025 now ships VS 2026 only, and SPC 2.8.5's doctor only
         # finds VS 2019/2022. Stay on windows-2022 until SPC supports VS 2026.
         os: [windows-2022]
@@ -119,7 +119,7 @@ jobs:
       - name: Build PHP
         run: |
           cd ../static-php-cli
-          ./bin/spc.exe build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}\.github\spc-patches\skip-phpmicro.php" --debug
+          ./bin/spc.exe build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}\.github\spc-patches\skip-phpmicro.php" --with-added-patch="${{ github.workspace }}\.github\spc-patches\libwebp-mux-windows.php" --debug
 
       - name: Get built PHP version
         run: |
