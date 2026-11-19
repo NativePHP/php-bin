@@ -101,6 +101,12 @@ jobs:
       - name: Build PHP
         run: |
           cd ../static-php-cli
+          # PHP 8.6's configure uses libtool 2.5, which rejects --with-pic.
+          # SPC 2.8.5's Linux default passes it, so swap in --enable-pic.
+          # SPC only fills in env.ini values that aren't already set.
+          if [ "${{ matrix.version }}" = "8.6" ]; then
+            export SPC_CMD_PREFIX_PHP_CONFIGURE="./configure --prefix= --with-valgrind=no --disable-shared --enable-static --disable-all --disable-phpdbg --enable-pic"
+          fi
           ./bin/spc build --build-cli "${{ env.PHP_EXTENSIONS }}" --with-libs="${{ env.PHP_LIBS }}" --with-added-patch="${{ github.workspace }}/.github/spc-patches/skip-phpmicro.php" --debug
 
       - name: Get built PHP version

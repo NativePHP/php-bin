@@ -21,7 +21,6 @@ on:
           - "8.3"
           - "8.4"
           - "8.5"
-          - "8.6"
         default: all
 
 env:
@@ -43,7 +42,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5","8.6"]' || format('["{0}"]', github.event.inputs.version)) }}
+        # No 8.6 yet: its GD needs libwebpmux, which SPC 2.8.5 builds without on Windows.
+        version: ${{ fromJSON((github.event.inputs.version || 'all') == 'all' && '["8.3","8.4","8.5"]' || format('["{0}"]', github.event.inputs.version)) }}
         # windows-2025 now ships VS 2026 only, and SPC 2.8.5's doctor only
         # finds VS 2019/2022. Stay on windows-2022 until SPC supports VS 2026.
         os: [windows-2022]
